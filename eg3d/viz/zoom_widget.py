@@ -29,7 +29,8 @@ class ZoomWidget:
             imgui.text('FOV')
             imgui.same_line(viz.label_w)
             with imgui_utils.item_width(viz.font_size * 10):
-                _changed, self.fov = imgui.slider_float('##fov', self.fov, 12, 45, format='%.2f Degrees')
+                print("Here 32")
+                _changed, self.fov = imgui.slider_float('##fov', self.fov, 0, 100, format='%.2f Degrees')
 
             imgui.same_line(viz.label_w + viz.font_size * 13 + viz.button_w + viz.spacing * 3)
             snapped = round(self.fov)

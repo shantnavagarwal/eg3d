@@ -1,0 +1,1 @@
+python gen_samples.py --network=networks/ffhqrebalanced512-64.pkl --outdir=out --trunc=0.7 --shapes=true --seeds=0-3 --fov-deg=7
