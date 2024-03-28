@@ -191,10 +191,10 @@ def generate_images(
             transformed_ray_directions_expanded = torch.zeros((samples.shape[0], max_batch, 3), device=z.device)
             transformed_ray_directions_expanded[..., -1] = -1
 
-            head = 0
+            head = int(samples.shape[1] * .35)
             with tqdm(total = samples.shape[1]) as pbar:
                 with torch.no_grad():
-                    while head < samples.shape[1]:
+                    while head < int(samples.shape[1] * .65):
                         torch.manual_seed(0)
                         sigma = G.sample(samples[:, head:head+max_batch], transformed_ray_directions_expanded[:, :samples.shape[1]-head], z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff, noise_mode='const')['sigma']
                         sigmas[:, head:head+max_batch] = sigma
@@ -213,6 +213,10 @@ def generate_images(
             sigmas[:, -pad:] = pad_value
             sigmas[:, :, :pad] = pad_value
             sigmas[:, :, -pad:] = pad_value
+            sigmas[:, :int(sigmas.shape[1]/2), :] = pad_value
+            sigmas[:, int(sigmas.shape[1]*.63):, :] = pad_value
+            print(sigmas.shape)
+            print(shape_res)
 
             if shape_format == '.ply':
                 from shape_utils import convert_sdf_samples_to_ply
