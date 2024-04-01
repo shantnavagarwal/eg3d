@@ -147,7 +147,7 @@ def generate_latent_images(
     for seed_idx, seed in enumerate(seeds):
         print('Generating image for seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
         z = torch.from_numpy(np.random.RandomState(seed).randn(1, G.z_dim)).to(device)
-        # print(max(z))
+        # print(z)
 
         imgs = []
         imgs_y = []
@@ -160,21 +160,22 @@ def generate_latent_images(
         conditioning_cam2world_pose = LookAtPoseSampler.sample(np.pi/2, np.pi/2, cam_pivot, radius=cam_radius, device=device)
         camera_params = torch.cat([cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
         conditioning_params = torch.cat([conditioning_cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
-        latent_range = 0.11
-        num_changes = 2
-        start_index = 10
-        num_scalars = 10
+        # conditioning_params = torch.zeros_like(conditioning_params)
+        latent_range = 100
+        num_changes = 5
+        start_index = 0
+        num_scalars = 5
+        truncation_psi = 1
+        truncation_cutoff = 1
         for i in range(num_scalars):
             print(i)
             row_imgs = []
-            index = start_index + i * 20
+            index = start_index + i * 1
             original = z[:, index]
-            ws = G.mapping(z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff)
-            img = G.synthesis(ws, camera_params)['image']
+            with dnnlib.util.open_url(network_pkl) as f:
+                G = legacy.load_network_pkl(f)['G_ema'].to(device)
 
-            img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
-            row_imgs.append(img)
-            for change in np.linspace(-1, 1, num_changes):
+            for change in np.linspace(-latent_range, latent_range, num_changes):
                 # print(change)
                 z[:, index] = change
                 # print(z[:, index])
@@ -184,7 +185,7 @@ def generate_latent_images(
                 img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
                 row_imgs.append(img)
 
-            z[:, index]= original
+            z[:, index] = original
             row_img = torch.cat(row_imgs, dim=2)
             imgs.append(row_img)
 
