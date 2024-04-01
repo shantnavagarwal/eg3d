@@ -13,7 +13,6 @@ gif
 archive
 *.ply
 eval
-out
 
 # evaluation:
 temp/
