@@ -1,14 +1,4 @@
-# SPDX-FileCopyrightText: Copyright (c) 2021-2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-# SPDX-License-Identifier: LicenseRef-NvidiaProprietary
-#
-# NVIDIA CORPORATION, its affiliates and licensors retain all intellectual
-# property and proprietary rights in and to this material, related
-# documentation and any modifications thereto. Any use, reproduction,
-# disclosure or distribution of this material and related documentation
-# without an express license agreement from NVIDIA CORPORATION or
-# its affiliates is strictly prohibited.
-
-"""Generate images and shapes using pretrained network pickle."""
+"""Generate images with changing latent vector using pretrained network pickle."""
 
 import os
 import re
@@ -114,7 +104,7 @@ def create_samples(N=256, voxel_origin=[0, 0, 0], cube_length=2.0):
 @click.option('--fov-deg', help='Field of View of camera in degrees', type=int, required=False, metavar='float', default=18.837, show_default=True)
 @click.option('--shape-format', help='Shape Format', type=click.Choice(['.mrc', '.ply']), default='.mrc')
 @click.option('--reload_modules', help='Overload persistent modules?', type=bool, required=False, metavar='BOOL', default=False, show_default=True)
-def generate_images(
+def generate_latent_images(
     network_pkl: str,
     seeds: List[int],
     truncation_psi: float,
@@ -128,12 +118,9 @@ def generate_images(
     reload_modules: bool,
 ):
     """Generate images using pretrained network pickle.
-
     Examples:
-
-    \b
     # Generate an image using pre-trained FFHQ model.
-    python gen_samples.py --outdir=output --trunc=0.7 --seeds=0-5 --shapes=True\\
+    python gen_latent.py --outdir=output --trunc=0.7 --seeds=0-5 --shapes=True\\
         --network=ffhq-rebalanced-128.pkl
     """
 
@@ -160,29 +147,43 @@ def generate_images(
     for seed_idx, seed in enumerate(seeds):
         print('Generating image for seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
         z = torch.from_numpy(np.random.RandomState(seed).randn(1, G.z_dim)).to(device)
+        # print(z)
 
         imgs = []
         imgs_y = []
-        angle_p = -0.2
-        angle_range_p = np.pi / 3
-        angle_range_y = np.pi / 3
-        num_angles = 5
-        for angle_p in np.linspace(-angle_range_p, angle_range_p, num_angles):
-            row_imgs = []
-            for angle_y in np.linspace(-angle_range_y, angle_range_y, num_angles):
-                cam_pivot = torch.tensor(G.rendering_kwargs.get('avg_camera_pivot', [0, 0, 0]), device=device)
-                cam_radius = G.rendering_kwargs.get('avg_camera_radius', 2.7)
-                cam2world_pose = LookAtPoseSampler.sample(np.pi/2 + angle_y, np.pi/2 + angle_p, cam_pivot, radius=cam_radius, device=device)
-                conditioning_cam2world_pose = LookAtPoseSampler.sample(np.pi/2, np.pi/2, cam_pivot, radius=cam_radius, device=device)
-                camera_params = torch.cat([cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
-                conditioning_params = torch.cat([conditioning_cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
 
+        angle_p = 0
+        angle_y = 0
+        cam_pivot = torch.tensor(G.rendering_kwargs.get('avg_camera_pivot', [0, 0, 0]), device=device)
+        cam_radius = G.rendering_kwargs.get('avg_camera_radius', 2.7)
+        cam2world_pose = LookAtPoseSampler.sample(np.pi/2 + angle_y, np.pi/2 + angle_p, cam_pivot, radius=cam_radius, device=device)
+        conditioning_cam2world_pose = LookAtPoseSampler.sample(np.pi/2, np.pi/2, cam_pivot, radius=cam_radius, device=device)
+        camera_params = torch.cat([cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
+        conditioning_params = torch.cat([conditioning_cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
+        # conditioning_params = torch.zeros_like(conditioning_params)
+        latent_range = 10
+        num_changes = 5
+        start_index = 0
+        num_scalars = 5
+        truncation_psi = 1
+        truncation_cutoff = 1
+        for i in range(num_scalars):
+            print(i)
+            row_imgs = []
+            index = start_index + i * 1
+            original = z[:, index].clone()
+
+            for change in np.linspace(-latent_range, latent_range, num_changes):
+                # print(change)
+                z[:, index] = change
+                # print(z[:, index])
                 ws = G.mapping(z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff)
                 img = G.synthesis(ws, camera_params)['image']
 
                 img = (img.permute(0, 2, 3, 1) * 127.5 + 128).clamp(0, 255).to(torch.uint8)
                 row_imgs.append(img)
 
+            z[:, index] = original
             row_img = torch.cat(row_imgs, dim=2)
             imgs.append(row_img)
 
@@ -200,10 +201,10 @@ def generate_images(
             transformed_ray_directions_expanded = torch.zeros((samples.shape[0], max_batch, 3), device=z.device)
             transformed_ray_directions_expanded[..., -1] = -1
 
-            head = int(samples.shape[1] * .35)
+            head = 0
             with tqdm(total = samples.shape[1]) as pbar:
                 with torch.no_grad():
-                    while head < int(samples.shape[1] * .65):
+                    while head < samples.shape[1]:
                         torch.manual_seed(0)
                         sigma = G.sample(samples[:, head:head+max_batch], transformed_ray_directions_expanded[:, :samples.shape[1]-head], z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff, noise_mode='const')['sigma']
                         sigmas[:, head:head+max_batch] = sigma
@@ -222,10 +223,6 @@ def generate_images(
             sigmas[:, -pad:] = pad_value
             sigmas[:, :, :pad] = pad_value
             sigmas[:, :, -pad:] = pad_value
-            sigmas[:, :int(sigmas.shape[1]/2), :] = pad_value
-            sigmas[:, int(sigmas.shape[1]*.63):, :] = pad_value
-            print(sigmas.shape)
-            print(shape_res)
 
             if shape_format == '.ply':
                 from shape_utils import convert_sdf_samples_to_ply
@@ -238,6 +235,6 @@ def generate_images(
 #----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    generate_images() # pylint: disable=no-value-for-parameter
+    generate_latent_images() # pylint: disable=no-value-for-parameter
 
 #----------------------------------------------------------------------------
