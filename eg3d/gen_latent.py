@@ -161,7 +161,7 @@ def generate_latent_images(
         camera_params = torch.cat([cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
         conditioning_params = torch.cat([conditioning_cam2world_pose.reshape(-1, 16), intrinsics.reshape(-1, 9)], 1)
         # conditioning_params = torch.zeros_like(conditioning_params)
-        latent_range = 100
+        latent_range = 10
         num_changes = 5
         start_index = 0
         num_scalars = 5
@@ -171,9 +171,7 @@ def generate_latent_images(
             print(i)
             row_imgs = []
             index = start_index + i * 1
-            original = z[:, index]
-            with dnnlib.util.open_url(network_pkl) as f:
-                G = legacy.load_network_pkl(f)['G_ema'].to(device)
+            original = z[:, index].clone()
 
             for change in np.linspace(-latent_range, latent_range, num_changes):
                 # print(change)
