@@ -137,7 +137,7 @@ class ImportanceRenderer(torch.nn.Module):
         else:
             rgb_final, depth_final, weights = self.ray_marcher(colors_coarse, densities_coarse, depths_coarse, rendering_options)
 
-        plot_densities_plots(densities_fine)
+        # plot_densities_plots(densities_fine)
         return rgb_final, depth_final, weights.sum(2)
 
     def run_model(self, planes, decoder, sample_coordinates, sample_directions, options):

@@ -18,6 +18,7 @@ import click
 import dnnlib
 import numpy as np
 import PIL.Image
+import PIL.ImageDraw
 import torch
 from tqdm import tqdm
 import mrcfile
@@ -161,14 +162,38 @@ def generate_images(
         print('Generating image for seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
         z = torch.from_numpy(np.random.RandomState(seed).randn(1, G.z_dim)).to(device)
 
-        imgs = []
-        imgs_y = []
-        angle_p = -0.2
         angle_range_p = np.pi / 3
         angle_range_y = np.pi / 3
         num_angles = 5
+
+        # Create a blank image for the labels row
+        label_row_width = 256
+        label_row_height = 256
+        img_width = num_angles * 512 + label_row_width
+        labels_img = PIL.Image.new('RGB', size=(img_width, label_row_height), color=(255, 255, 255))
+        draw = PIL.ImageDraw.Draw(labels_img)
+
+        # Draw labels onto the image
+        font = PIL.ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMono.ttf", 35, encoding="unic")
+        label_spacing = 512
+        draw.text((label_row_width + (img_width - label_row_width) // 2 - 530, label_row_height // 4),
+                  f"Change in camera angles [rad] - {network_pkl.split('/')[1].split('.')[0]}",
+                  fill=(0, 0, 0), font=font)
+        for i, label in enumerate(np.linspace(-angle_range_y, angle_range_y, num_angles)):
+            draw.text((label_row_width + i * label_spacing + label_spacing//2 - 20, 3*label_row_height//4),
+                      str(round(label, 2)), fill=(0, 0, 0), font=font)
+
+        # Append the changes row image labels to the list of images
+        text_tensor = torch.tensor(np.array(labels_img)).unsqueeze(0).to(device)
+        imgs = [text_tensor]
+
         for angle_p in np.linspace(-angle_range_p, angle_range_p, num_angles):
-            row_imgs = []
+            title_img = PIL.Image.new("RGB", (label_row_width, 512), color=(255, 255, 255))
+            draw = PIL.ImageDraw.Draw(title_img)
+            draw.text((100, 256), str(round(angle_p, 2)), fill=(0, 0, 0), font=font)
+            text_tensor = torch.tensor(np.array(title_img)).unsqueeze(0).to(device)
+            row_imgs = [text_tensor]
+
             for angle_y in np.linspace(-angle_range_y, angle_range_y, num_angles):
                 cam_pivot = torch.tensor(G.rendering_kwargs.get('avg_camera_pivot', [0, 0, 0]), device=device)
                 cam_radius = G.rendering_kwargs.get('avg_camera_radius', 2.7)
@@ -188,7 +213,7 @@ def generate_images(
 
         img = torch.cat(imgs, dim=1)
 
-        PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/seed{seed:04d}.png')
+        PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f"{outdir}/angles-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}.png")
 
         if shapes:
             # extract a shape.mrc with marching cubes. You can view the .mrc file using ChimeraX from UCSF.
