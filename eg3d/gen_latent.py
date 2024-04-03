@@ -161,14 +161,14 @@ def generate_latent_images(
         latent_range = 10
         num_changes = 5
         start_index = 0
-        num_scalars = 5
+        num_scalars = 50
         truncation_psi = 1
         truncation_cutoff = 1
 
         # Create a blank image for the labels row
         label_row_width = 256
         label_row_height = 256
-        img_width = num_scalars * 512 + label_row_width
+        img_width = num_changes * 512 + label_row_width
         labels_img = PIL.Image.new('RGB', size=(img_width, label_row_height), color=(255, 255, 255))
         draw = PIL.ImageDraw.Draw(labels_img)
 
@@ -189,7 +189,7 @@ def generate_latent_images(
         for i in range(num_scalars):
             print(f'Scalar: {i}')
             row_imgs = []
-            index = start_index + i * 1
+            index = start_index + i * 1  # Option to skip to explore more of the latent space
             original = z[:, index].clone()  # Copy the original value of the latent vector to reset afterward
 
             row_name = f"Scalar {i}"
@@ -213,8 +213,16 @@ def generate_latent_images(
             imgs.append(row_img)
 
         img = torch.cat(imgs, dim=1)
-        print('saving')
-        PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f"{outdir}/latent-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}.png")
+
+        compressed = True
+        if not compressed:
+            print('saving uncompressed images')
+            PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(
+                f"{outdir}/latent-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}.png")
+        else:
+            print('saving compressed images')
+            PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(
+                f"{outdir}/latent-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}-comp.jpg", quality=50)
 
         if shapes:
             # extract a shape.mrc with marching cubes. You can view the .mrc file using ChimeraX from UCSF.
