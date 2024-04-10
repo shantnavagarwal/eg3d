@@ -28,9 +28,14 @@ def plot_densities_plots(densities_fine) -> None:
     frames = np.transpose(densities_fine_stand, (2, 0, 1))
     frames = np.expand_dims(frames, axis=3)*255
     clip = ImageSequenceClip(list(frames), fps=5)
-    filename = 'out/test3'
+    filename = 'out/test2'
     clip.write_gif(filename+'.gif', fps=20)
     cv.imwrite(filename+'.png', densities_fine_last*255)
+
+    frame_indices = np.linspace(0, len(frames) - 1, 4, dtype=int)
+    img_arr = [frames[i] for i in frame_indices]
+    out = np.concatenate(img_arr, axis=1)
+    cv.imwrite(filename + 'blog.png', out)
     # plot_3d_array(densities_fine_stand)
     return
 
@@ -49,10 +54,15 @@ def plot_colors_plots(colors_fine) -> None:
     frames = np.transpose(colors_fine_stand, (2, 0, 1, 3))
     frames = frames*255
     clip = ImageSequenceClip(list(frames), fps=5)
-    filename = 'out/test3c'
+    filename = 'out/test2c'
     clip.write_gif(filename+'.gif', fps=20)
     cv.imwrite(filename+'.png', colors_fine_last[:, :, 0, :]*255)
     # plot_3d_array(densities_fine_stand)
+
+    frame_indices = np.linspace(0, len(frames) - 1, 4, dtype=int)
+    img_arr = [frames[i] for i in frame_indices]
+    out = np.concatenate(img_arr, axis=1)
+    cv.imwrite(filename + 'blog.png', out)
     return
 
 def plot_3d_array(array):
