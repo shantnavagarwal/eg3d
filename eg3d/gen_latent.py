@@ -8,6 +8,7 @@ import click
 import dnnlib
 import numpy as np
 import PIL.Image
+import PIL.ImageDraw
 import torch
 from tqdm import tqdm
 import mrcfile
@@ -148,10 +149,6 @@ def generate_latent_images(
         print('Generating image for seed %d (%d/%d) ...' % (seed, seed_idx, len(seeds)))
         z = torch.from_numpy(np.random.RandomState(seed).randn(1, G.z_dim)).to(device)
         # print(z)
-
-        imgs = []
-        imgs_y = []
-
         angle_p = 0
         angle_y = 0
         cam_pivot = torch.tensor(G.rendering_kwargs.get('avg_camera_pivot', [0, 0, 0]), device=device)
@@ -164,17 +161,45 @@ def generate_latent_images(
         latent_range = 10
         num_changes = 5
         start_index = 0
-        num_scalars = 5
+        num_scalars = 50
         truncation_psi = 1
         truncation_cutoff = 1
+
+        # Create a blank image for the labels row
+        label_row_width = 256
+        label_row_height = 256
+        img_width = num_changes * 512 + label_row_width
+        labels_img = PIL.Image.new('RGB', size=(img_width, label_row_height), color=(255, 255, 255))
+        draw = PIL.ImageDraw.Draw(labels_img)
+
+        # Draw labels onto the image
+        font = PIL.ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMono.ttf", 35, encoding="unic")
+        label_spacing = 512
+        draw.text((label_row_width + (img_width - label_row_width) // 2 - 300, label_row_height // 4), "Change in latent vector entry",
+                  fill=(0, 0, 0), font=font)
+        for i, label in enumerate(np.linspace(-latent_range, latent_range, num_changes)):
+            draw.text((label_row_width + i * label_spacing + label_spacing//2, 3*label_row_height//4), str(label), fill=(0, 0, 0),
+                      font=font)
+
+        # Append the changes row image labels to the list of images
+        text_tensor = torch.tensor(np.array(labels_img)).unsqueeze(0).to(device)
+        imgs = [text_tensor]
+
+
         for i in range(num_scalars):
-            print(i)
+            print(f'Scalar: {i}')
             row_imgs = []
-            index = start_index + i * 1
-            original = z[:, index].clone()
+            index = start_index + i * 1  # Option to skip to explore more of the latent space
+            original = z[:, index].clone()  # Copy the original value of the latent vector to reset afterward
+
+            row_name = f"Scalar {i}"
+            title_img = PIL.Image.new("RGB", (label_row_width, 512), color=(255, 255, 255))
+            draw = PIL.ImageDraw.Draw(title_img)
+            draw.text((50, 256), row_name, fill=(0, 0, 0), font=font)
+            text_tensor = torch.tensor(np.array(title_img)).unsqueeze(0).to(device)
+            row_imgs = [text_tensor]
 
             for change in np.linspace(-latent_range, latent_range, num_changes):
-                # print(change)
                 z[:, index] = change
                 # print(z[:, index])
                 ws = G.mapping(z, conditioning_params, truncation_psi=truncation_psi, truncation_cutoff=truncation_cutoff)
@@ -189,7 +214,15 @@ def generate_latent_images(
 
         img = torch.cat(imgs, dim=1)
 
-        PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(f'{outdir}/seed{seed:04d}.png')
+        compressed = True
+        if not compressed:
+            print('saving uncompressed images')
+            PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(
+                f"{outdir}/latent-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}.png")
+        else:
+            print('saving compressed images')
+            PIL.Image.fromarray(img[0].cpu().numpy(), 'RGB').save(
+                f"{outdir}/latent-{seed:04d}-{network_pkl.split('/')[1].split('.')[0]}-comp.jpg", quality=50)
 
         if shapes:
             # extract a shape.mrc with marching cubes. You can view the .mrc file using ChimeraX from UCSF.
