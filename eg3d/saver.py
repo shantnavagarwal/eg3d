@@ -28,7 +28,7 @@ def plot_densities_plots(densities_fine) -> None:
     frames = np.transpose(densities_fine_stand, (2, 0, 1))
     frames = np.expand_dims(frames, axis=3)*255
     clip = ImageSequenceClip(list(frames), fps=5)
-    filename = 'out/test1'
+    filename = 'out/test3'
     clip.write_gif(filename+'.gif', fps=20)
     cv.imwrite(filename+'.png', densities_fine_last*255)
     # plot_3d_array(densities_fine_stand)
@@ -49,7 +49,7 @@ def plot_colors_plots(colors_fine) -> None:
     frames = np.transpose(colors_fine_stand, (2, 0, 1, 3))
     frames = frames*255
     clip = ImageSequenceClip(list(frames), fps=5)
-    filename = 'out/test1c'
+    filename = 'out/test3c'
     clip.write_gif(filename+'.gif', fps=20)
     cv.imwrite(filename+'.png', colors_fine_last[:, :, 0, :]*255)
     # plot_3d_array(densities_fine_stand)
