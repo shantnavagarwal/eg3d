@@ -58,7 +58,7 @@ width="100%"}
 
 2.  **Novel tri-plane 3D representation** Then, a hybrid
     implicit-explicit tri-plane representation such as in figure
-    [2](#fig:triplane){reference-type="ref" reference="fig:triplane"} is
+    [2](#fig:triplane) is
     used to represent the found features. Neural implicit
     representations (NeRF) use fully connected layers with positional
     encoding, which is slow to query. Explicit voxels are fast to query,
@@ -67,7 +67,7 @@ width="100%"}
     it is fast and efficient.
 
     ![Different types of feature representations
-    [@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/triplane.jpg){#fig:triplane width="50%"}
+    [@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/triplane.jpg)
 
 3.  **Neural volume renderer** A multi-layer perceptron (MLP) decoder
     reads out the 3D feature volume by sending out rays along which a
@@ -95,24 +95,20 @@ width="100%"}
 # Steep angle analysis
 
 The background of the portrait images changes together with the pose.
-Figure [3](#fig:non_rebalanced){reference-type="ref"
-reference="fig:non_rebalanced"} shows the input image in the center. All
+Figure [3](#fig:non_rebalanced) shows the input image in the center. All
 the output images are the surrounding images. When the angle becomes
 larger, shown in the outermost columns of figure
-[3](#fig:non_rebalanced){reference-type="ref"
-reference="fig:non_rebalanced"}, the extremities of the background turn
+[3](#fig:non_rebalanced), the extremities of the background turn
 black. In these same images, the backside of the heads is also distorted
 with random colors and blurred patches. Using a 'rebalanced' model gives
 much better results, shown in figure
-[4](#fig:rebalanced){reference-type="ref" reference="fig:rebalanced"}.
+[4](#fig:rebalanced).
 For the same angles, we can see that the black background and blurring
 on the rear of the heads have been solved largely.\
 This effect is rather easy to explain. The original model is trained
 mainly on images where the person looks straight ahead into the camera,
 such as the middle (input) picture in figures
-[3](#fig:non_rebalanced){reference-type="ref"
-reference="fig:non_rebalanced"} and
-[4](#fig:rebalanced){reference-type="ref" reference="fig:rebalanced"}.
+[3](#fig:non_rebalanced) and [4](#fig:rebalanced).
 This means that the model has less knowledge about side projections of
 human heads, what the back of the head looks like and changes in
 background features.\
@@ -126,18 +122,17 @@ extrapolate the colors of the background better, and why the backsides
 of the heads are no longer blurred.
 
 ![Background with black patches using original
-model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhq512-128.png){#fig:non_rebalanced width="60%"}
+model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhq512-128.png)
 
 ![Background improvements using rebalanced
-model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhqrebalanced512-128.png){#fig:rebalanced
-width="60%"}
+model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhqrebalanced512-128.png)
 
 To provide further evidence, we studied the neural volume renderer of
 the model to see how values of color and density cause the final
 rendered image to be dark where little knowledge is available. Figures
 [6](#fig:density_seed1){reference-type="ref"
 reference="fig:density_seed1"} and
-[7](#fig:color_seed1){reference-type="ref" reference="fig:color_seed1"}
+[7](#fig:color_seed1)
 show the values of density and colour that are the output of the
 tri-plane, and are used by \"volume rendering\" to create the raw image.
 For the dark regions, we can see that the colours values are close to
@@ -152,15 +147,15 @@ Together this analysis explains why the extremities of renders become
 black in very oblique angles.
 
 ![Rendered image with black background in the
-border](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/seed0001.png){#fig:seed1_extreme_angle width="50%"}
+border](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/seed0001.png)
 
 ![Variation of density values across channels. First three images are of
 channels equidistant from each other with the rightmost image being an
-average value of all channels.](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1blog.png){#fig:density_seed1}
+average value of all channels.](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1blog.png)
 
 ![Variation of color values across channels. 32 channel feature-images
 are output, only the first three channels are
-rendered](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1cblog.png){#fig:color_seed1}
+rendered](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1cblog.png)
 
 # Feature editing
 
