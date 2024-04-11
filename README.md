@@ -67,7 +67,7 @@ width="100%"}
     it is fast and efficient.
 
     ![Different types of feature representations
-    [@chan2022efficient]](triplane.jpg){#fig:triplane width="50%"}
+    [@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/triplane.jpg){#fig:triplane width="50%"}
 
 3.  **Neural volume renderer** A multi-layer perceptron (MLP) decoder
     reads out the 3D feature volume by sending out rays along which a
@@ -126,10 +126,10 @@ extrapolate the colors of the background better, and why the backsides
 of the heads are no longer blurred.
 
 ![Background with black patches using original
-model](angles-0001-ffhq512-128.png){#fig:non_rebalanced width="60%"}
+model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhq512-128.png){#fig:non_rebalanced width="60%"}
 
 ![Background improvements using rebalanced
-model](angles-0001-ffhqrebalanced512-128.png){#fig:rebalanced
+model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ffhqrebalanced512-128.png){#fig:rebalanced
 width="60%"}
 
 To provide further evidence, we studied the neural volume renderer of
@@ -152,15 +152,15 @@ Together this analysis explains why the extremities of renders become
 black in very oblique angles.
 
 ![Rendered image with black background in the
-border](seed0001.png){#fig:seed1_extreme_angle width="50%"}
+border](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/seed0001.png){#fig:seed1_extreme_angle width="50%"}
 
 ![Variation of density values across channels. First three images are of
 channels equidistant from each other with the rightmost image being an
-average value of all channels.](test1blog.png){#fig:density_seed1}
+average value of all channels.](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1blog.png){#fig:density_seed1}
 
 ![Variation of color values across channels. 32 channel feature-images
 are output, only the first three channels are
-rendered](test1cblog.png){#fig:color_seed1}
+rendered](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/test1cblog.png){#fig:color_seed1}
 
 # Feature editing
 
@@ -200,7 +200,7 @@ models, it can be seen that the eye sockets are concave, shown in figure
 reference="fig:concave_eyes"}.
 
 ![3D rendered eyes showing the concave eye area
-[@chan2022efficient]](concave_eyes.jpg){#fig:concave_eyes
+[@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/concave_eyes.jpg){#fig:concave_eyes
 width=".9\\linewidth"}
 
 When creating the 2D images from different viewing angles, the model
@@ -224,10 +224,10 @@ in figure [11](#fig:cropped_eyes){reference-type="ref"
 reference="fig:cropped_eyes"}.
 
 ![Framework with the additional step to extract the eye
-region](eye_rendering_step.jpg){#fig:eye_rendering_step
+region](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/eye_rendering_step.jpg){#fig:eye_rendering_step
 width=".6\\linewidth"}
 
-![Cropped 3D model of only the eyes](Cropped eyes.jpg){#fig:cropped_eyes
+![Cropped 3D model of only the eyes](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/Cropped%20eyes.jpg){#fig:cropped_eyes
 width="70%"}
 
 ## 3D Eye model
@@ -268,6 +268,6 @@ facial features.
 # Work distribution
 
 <figure id="fig:work_distribution">
-<img src="Work distribution.jpg" style="width:90.0%" />
+<img src="https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/Work%20distribution.jpg" style="width:90.0%" />
 <figcaption>Work distribution during the project</figcaption>
 </figure>
