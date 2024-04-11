@@ -1,10 +1,10 @@
 ---
 author:
 - |
-  Valérie van Noesel, 4874579, V.S.vanNoesel@student.tudelft.nl\
-  Menthe Steensma, 4941381, M.M.Steensma@student.tudelft.nl\
-  Matthijs Steyerberg, 4668677, M.D.Steyerberg@student.tudelft.nl\
-  Shantnav Agarwal, 5939933, S.Agarwal-19@student.tudelft.nl
+  Valérie van Noesel\
+  Menthe Steensma\
+  Matthijs Steyerberg\
+  Shantnav Agarwall
 bibliography:
 - sample.bib
 date: April $11^{th}$ 2024
