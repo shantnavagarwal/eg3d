@@ -39,14 +39,12 @@ potential improvement, so that different eye poses can be generated.
 
 In order to understand what the reproducibility project involves, we
 first start with a quick review of what has been done in the original
-paper. In figure [1](#fig:gan_framework){reference-type="ref"
-reference="fig:gan_framework"}, an overview of the full 3D framework is
+paper. In figure [1](#fig:gan_framework), an overview of the full 3D framework is
 given [@chan2022efficient]. The process can be split up in several
 steps, which will shortly be explained in this section.
 
 ![3D GAN framework used in the original paper
-[@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/3D%20GAN%20network.jpg){#fig:gan_framework
-width="100%"}
+[@chan2022efficient]](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/3D%20GAN%20network.jpg)
 
 1.  **StyleGAN2-based feature generator** One of the advances in the
     paper was the decoupling of the neural rendering step from the
@@ -130,8 +128,7 @@ model](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/angles-0001-ff
 To provide further evidence, we studied the neural volume renderer of
 the model to see how values of color and density cause the final
 rendered image to be dark where little knowledge is available. Figures
-[6](#fig:density_seed1){reference-type="ref"
-reference="fig:density_seed1"} and
+[6](#fig:density_seed1) and
 [7](#fig:color_seed1)
 show the values of density and colour that are the output of the
 tri-plane, and are used by \"volume rendering\" to create the raw image.
@@ -139,8 +136,7 @@ For the dark regions, we can see that the colours values are close to
 black, and densities are close to zero. Low volume density values
 particularly signify that there is no surface on which the ray will
 terminate. At the right side (near the back of the head) of figure
-[5](#fig:seed1_extreme_angle){reference-type="ref"
-reference="fig:seed1_extreme_angle"}, we see that volume density is
+[5](#fig:seed1_extreme_angle), we see that volume density is
 high - correctly -, but presumably because of absence of any knowledge,
 the color values are unknown, and therefore close to zero (i.e. black).
 Together this analysis explains why the extremities of renders become
@@ -210,17 +206,13 @@ full head, it is not possible to change the model's output to only the
 eyes without retraining the model. Instead, the eye portion is extracted
 from the full 3D head and only that part is rendered with the computer
 graphics algorithm Marching cubes (figure
-[10](#fig:eye_rendering_step){reference-type="ref"
-reference="fig:eye_rendering_step"}). The resulting 3D model can be seen
-in figure [11](#fig:cropped_eyes){reference-type="ref"
-reference="fig:cropped_eyes"}.
+[10](#fig:eye_rendering_step)). The resulting 3D model can be seen
+in figure [11](#fig:cropped_eyes).
 
 ![Framework with the additional step to extract the eye
-region](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/eye_rendering_step.jpg){#fig:eye_rendering_step
-width=".6\\linewidth"}
+region](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/eye_rendering_step.jpg)
 
-![Cropped 3D model of only the eyes](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/Cropped%20eyes.jpg){#fig:cropped_eyes
-width="70%"}
+![Cropped 3D model of only the eyes](https://github.com/shantnavagarwal/eg3d/blob/main/eg3d/out/Cropped%20eyes.jpg)
 
 ## 3D Eye model
 
