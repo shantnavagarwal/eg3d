@@ -1,10 +1,13 @@
 ---
 author:
 - |
-  Valérie van Noesel\\
-  Menthe Steensma\\
-  Matthijs Steyerberg\\
-  Shantnav Agarwal\\
+  Valérie van Noesel
+  
+  Menthe Steensma
+  
+  Matthijs Steyerberg
+  
+  Shantnav Agarwal
 date: April $11^{th}$ 2024
 title: Deep Learning Reproducibility
 ---
