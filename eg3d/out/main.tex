@@ -1,0 +1,50 @@
+\documentclass{article}
+%\documentclass[a4paper, 11pt, left=2cm, right=2cm, top=2cm, bottom=2cm]{article}
+\usepackage[left=2cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+
+\usepackage{graphicx} % Required for inserting images
+\usepackage{float}
+
+%colored text
+\usepackage{xcolor}
+
+\usepackage{biblatex}
+\bibliography{sample}
+
+\title{Deep Learning Reproducibility}
+\author{Valérie van Noesel,     4874579,    V.S.vanNoesel@student.tudelft.nl \\ 
+Menthe Steensma,     4941381,    M.M.Steensma@student.tudelft.nl\\ 
+Matthijs Steyerberg,  4668677,   M.D.Steyerberg@student.tudelft.nl\\ 
+Shantnav Agarwal,    5939933,    S.Agarwal-19@student.tudelft.nl }
+\date{April $11^{th}$ 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+With the advance of modern GPUs, more complex machine learning models become feasible. In this blog, the use of generative adversarial networks (GANs) to generate faces with different poses is explored. In 2021, Eric Chan et al. \cite{chan2022efficient} published an article that provided an application of generating poses and angles of a 2D portrait image. Additionally, it creates a 3D model of the face based on the image. The code to this model is available on github \parencite{github}.\\
+This paper has two main contributions. Firstly, this paper reduces model complexity by use of a hybrid representation of features on a tri-plane. Secondly, this paper decouples feature extraction and neural rendering, which makes it possible to use existing 2D models such as StyleGAN2.\\
+We provide a reproducibility check by recreating outputs similar to figure 6 from the original paper. Additionally we explore the generation process to make a person's features adjustable by changing the latent vector. In this blog we will discuss the cause of background blackening and blurring at steep camera angles, by comparing two models. Also, an analysis of feature editing by changing the latent vector values and a 3D model of the eye region is generated. \\
+Finally, one of the shortcomings of the proposed method is that the generated 3D model contains a concave eye model, and unrealistic eye pose in 2D: eyes keep focused on the camera, even at steep angles. The aim of our extracted 3D eye model is to facilitate further analysis and potential improvement, so that different eye poses can be generated. 
+
+\input{Short recap of the paper}
+\input{Background analysis}
+\input{feature editing}
+\input{Eye rendering}
+ 
+\section{Small summary}
+In this blog post, we delved into the possibilities enabled by modern GPUs to generate faces with various poses and characteristics based on the 2021 article by Eric Chan et al. \cite{chan2022efficient}, which showcased the creation of 3D models from 2D portrait images using GANs. We have replicated figures from the original paper, and pushed the model even further exploring more extreme angles to generate faces. Additionally, we explored the adaptability of generated features by making changes to the latent vector entries to influence the rendered person portrait. We discussed the differences between normal and rebalanced models, and identified a pitfall concerning the unrealistic concave eye rendering in generated images. To better understand this issue, we initiated a process to analyze and potentially improve the rendering of the eye region. This involves the extraction and rendering of only the eye portion of the 3D models. Overall, our exploration sheds light on both the capabilities and limitations of this GAN-based approaches in generating realistic facial images with various poses and facial features.
+
+
+\section{Work distribution}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Work distribution.jpg}
+    \caption[width=0.6]{Work distribution during the project}
+    \label{fig:work_distribution}
+\end{figure}
+
+\printbibliography
+\end{document}

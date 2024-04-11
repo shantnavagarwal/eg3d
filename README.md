@@ -4,9 +4,7 @@ author:
   Valérie van Noesel\
   Menthe Steensma\
   Matthijs Steyerberg\
-  Shantnav Agarwall
-bibliography:
-- sample.bib
+  Shantnav Agarwal\
 date: April $11^{th}$ 2024
 title: Deep Learning Reproducibility
 ---
@@ -47,7 +45,7 @@ given [@chan2022efficient]. The process can be split up in several
 steps, which will shortly be explained in this section.
 
 ![3D GAN framework used in the original paper
-[@chan2022efficient]](3D GAN network.jpg){#fig:gan_framework
+[@chan2022efficient]](eg3d/out/3D GAN network.jpg){#fig:gan_framework
 width="100%"}
 
 1.  **StyleGAN2-based feature generator** One of the advances in the
